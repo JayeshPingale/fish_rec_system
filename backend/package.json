@@ -1,0 +1,27 @@
+{
+  "name": "onlyfish",
+  "version": "1.0.0",
+  "description": "sem7 project",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JayeshPingale/fish_rec_system.git"
+  },
+  "keywords": [
+    "fish"
+  ],
+  "author": "jayesh",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/JayeshPingale/fish_rec_system/issues"
+  },
+  "homepage": "https://github.com/JayeshPingale/fish_rec_system#readme",
+  "dependencies": {
+    "express": "^4.19.2",
+    "mongoose": "^8.5.2"
+  }
+}
