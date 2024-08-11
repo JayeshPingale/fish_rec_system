@@ -1,32 +1,40 @@
 const express = require('express');
-const mongoose = require('mongoose');
 const multer = require('multer');
+const cors = require('cors');
 const path = require('path');
-const Image = require('./models/Image'); // Assuming you've set up a model
-require('dotenv').config(); // Make sure you have dotenv installed and configured
 
 const app = express();
-const upload = multer({ dest: 'uploads/' }); // Or configure as needed
 
-// Route for uploading images
-app.post('/api/images/upload', upload.single('image'), async (req, res) => {
-  try {
-    const newImage = new Image({
-      imageName: req.file.originalname,
-      imagePath: req.file.path,
-    });
-    await newImage.save();
-    res.status(200).json({ message: 'Image uploaded successfully' });
-  } catch (err) {
-    res.status(500).json({ error: 'Failed to upload image' });
-  }
+app.use(cors());
+app.use(express.json());
+app.use('/upload', express.static(path.join(__dirname, 'upload')));
+
+const storage = multer.diskStorage({
+    destination: './upload/',
+    filename: function (req, file, cb) {
+        cb(null, `${Date.now()}_${file.originalname}`);
+    },
 });
 
-// Connect to MongoDB using the environment variable
-console.log('MONGOURI:', process.env.MONGOURI);
-mongoose.connect(process.env.MONGOURI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
+const upload = multer({ storage: storage });
+
+app.post('/upload', upload.single('image'), (req, res) => {
+    if (!req.file) {
+        return res.status(400).json({ msg: 'No file uploaded' });
+    }
+    const imageUrl = `http://localhost:5000/uploads/${req.file.filename}`;
+    res.json({ imageUrl });
+});
+
+// MongoDB connection
+const mongoose = require('mongoose');
+require('dotenv').config();
+
+const mongoURI = process.env.MONGOURI;
+console.log('MongoDB URI:', process.env.MONGOURI);
+mongoose.connect(mongoURI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
 })
-.then(() => app.listen(5000, () => console.log('Server started on port 5000')))
-.catch(err => console.log(err));
+.then(() => console.log('MongoDB connected...'))
+.catch(err => console.error('MongoDB connection error:', err));
